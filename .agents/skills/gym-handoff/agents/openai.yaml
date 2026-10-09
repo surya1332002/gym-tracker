@@ -1,0 +1,3 @@
+interface:
+  display_name: "Gym Tracker Handoff"
+  short_description: "Verify Gym Tracker state and prepare session handoffs"

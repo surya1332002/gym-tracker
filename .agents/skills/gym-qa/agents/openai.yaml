@@ -1,0 +1,3 @@
+interface:
+  display_name: "Gym Tracker Quality Assurance"
+  short_description: "Verify Gym Tracker behaviour and report reproducible findings"

@@ -1,0 +1,23 @@
+.catalogue-notice { padding: 16px 20px; border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 12px; color: var(--muted); font-size: .85rem; margin-bottom: 24px; }
+.catalogue-notice strong { display: block; color: var(--text); margin-bottom: 4px; }
+.library-controls { display: grid; gap: 16px; padding: 20px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; }
+.library-controls label { display: flex; flex-direction: column; gap: 8px; font-size: .85rem; font-weight: 650; min-width: 0; }
+.library-controls input, .library-controls select { width: 100%; min-width: 0; min-height: 48px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--background); color: var(--text); font: inherit; font-size: 16px; }
+.reset-filters { background: var(--surface); border-color: var(--border); color: var(--text); }
+.result-count { color: var(--muted); font-size: .85rem; margin: 24px 0 12px; }
+.exercise-list { list-style: none; margin: 0; padding: 0; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); }
+.exercise-list li + li { border-top: 1px solid var(--border); }
+.exercise-list a { padding: 20px; min-height: 76px; display: flex; align-items: center; justify-content: space-between; gap: 16px; color: var(--text); border-radius: 12px; }
+.exercise-list a:hover { background: var(--accent-soft); text-decoration: none; }
+.exercise-list small { display: block; color: var(--muted); font-size: .8rem; margin-top: 5px; }
+.exercise-list a > span:last-child { color: var(--accent-text); }
+.library-message, .exercise-guide { padding: 24px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; }
+.library-message p, .exercise-guide p, .exercise-guide small { color: var(--muted); }
+.primary-action { color: var(--on-accent); background: var(--accent); }
+.library-back { display: inline-flex; align-items: center; min-height: 44px; margin-bottom: 16px; }
+.exercise-guide h2 { font-size: 1.25rem; }
+.exercise-guide dl { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 16px; }
+.exercise-guide dd { margin: 0; overflow-wrap: anywhere; }
+.future-settings { border-top: 1px solid var(--border); padding-top: 20px; margin-top: 28px; }
+@media (min-width: 700px) { .library-controls { grid-template-columns: repeat(2, minmax(0, 1fr)); } .exercise-search { grid-column: 1 / -1; } .reset-filters { grid-column: 1 / -1; justify-self: start; } }
+@media (min-width: 1200px) { .library-controls { grid-template-columns: 2fr 1fr 1fr; } .exercise-search { grid-column: auto; } }

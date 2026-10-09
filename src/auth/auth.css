@@ -1,0 +1,67 @@
+.gym-auth-screen {
+  min-height: 100vh;
+  min-height: 100dvh;
+  width: 100vw;
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  padding: 32px 20px;
+  background: radial-gradient(ellipse at top, #e5f0e9, #f4f6f4 65%);
+  color: #17291f;
+  color-scheme: light;
+}
+.gym-auth-card {
+  width: 100%;
+  max-width: 420px;
+  box-sizing: border-box;
+  padding: 32px;
+  border: 1px solid #dce5de;
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 20px 60px #1837220d;
+  text-align: left;
+}
+.gym-auth-brand { font-size: 12px; letter-spacing: .16em; font-weight: 800; color: #417657; }
+.gym-auth-card h1 { font-size: 30px; line-height: 1.15; margin: 18px 0 12px; letter-spacing: -.04em; }
+.gym-auth-intro { color: #627169; margin: 0 0 24px; }
+.gym-auth-modes { display: flex; padding: 4px; gap: 4px; background: #f0f4f1; border-radius: 12px; margin-bottom: 24px; }
+.gym-auth-modes button { flex: 1; background: transparent; color: #52645a; min-height: 44px; }
+.gym-auth-modes button[aria-pressed="true"] { background: #fff; color: #17291f; box-shadow: 0 2px 5px #18372212; }
+.gym-auth-card label { display: block; font-size: 14px; font-weight: 600; margin: 16px 0 7px; }
+.gym-auth-card input { width: 100%; box-sizing: border-box; min-height: 48px; border: 1px solid #cbd7cf; border-radius: 10px; padding: 12px; background: #fff; color: #17291f; font: inherit; font-size: 16px; }
+.gym-auth-card input:focus-visible, .gym-auth-screen button:focus-visible, .gym-account-bar button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.gym-auth-screen button, .gym-account-bar button { font: inherit; font-weight: 600; border-radius: 10px; min-height: 44px; }
+.gym-auth-screen button:disabled, .gym-account-bar button:disabled { opacity: .6; cursor: wait; }
+.gym-auth-primary { width: 100%; margin-top: 20px; color: #fff; background: #23583a; }
+.gym-auth-primary:hover { background: #19472d; border-color: #19472d; }
+.gym-auth-hint, .gym-auth-footnote { font-size: 12px; color: #627169; line-height: 1.6; }
+.gym-auth-footnote { text-align: center; margin: 24px 0 0; }
+.gym-auth-error, .gym-auth-message { padding: 12px; border-radius: 10px; font-size: 14px; overflow-wrap: anywhere; }
+.gym-auth-error { color: #912d2d; background: #fff0f0; }
+.gym-auth-message { color: #23583a; background: #edf7ef; }
+.gym-auth-resend { width: 100%; background: transparent; color: #23583a; margin-top: 12px; }
+.gym-account-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 12px; padding: 12px 16px; background: #f0f4f1; color: #17291f; color-scheme: light; }
+.gym-account-email { font-size: 14px; overflow-wrap: anywhere; min-width: 0; flex: 1; }
+.gym-auth-secondary { background: #fff; color: #23583a; border: 1px solid #cbd7cf; }
+.gym-account-bar .gym-auth-error { width: 100%; margin: 0; }
+.gym-profile-status { width: 100%; font-size: 13px; overflow-wrap: anywhere; }
+.gym-profile-status p { margin: 4px 0 10px; }
+.gym-profile-status summary { cursor: pointer; padding: 8px 0; }
+.gym-profile-status dl { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 14px; margin: 8px 0; }
+.gym-profile-status dt { font-weight: 600; }
+.gym-profile-status dd { margin: 0; }
+@media (max-width: 480px) { .gym-auth-screen { padding: 20px 16px; } .gym-auth-card { padding: 28px 22px; } }
+
+/* The shell's theme also applies to the preserved authentication/profile UI. */
+.gym-auth-screen { background: var(--background); color: var(--text); color-scheme: inherit; width: 100%; }
+.gym-auth-card { background: var(--surface); border-color: var(--border); }
+.gym-auth-brand, .gym-auth-resend { color: var(--accent-text); }
+.gym-auth-intro, .gym-auth-hint, .gym-auth-footnote { color: var(--muted); }
+.gym-auth-modes { background: var(--background); }
+.gym-auth-modes button { color: var(--muted); }
+.gym-auth-modes button[aria-pressed="true"] { background: var(--surface); color: var(--text); }
+.gym-auth-card input { background: var(--surface); color: var(--text); border-color: var(--border); }
+.gym-auth-primary, .gym-auth-primary:hover { background: var(--accent); color: var(--on-accent); }
+.gym-auth-secondary { background: var(--surface); color: var(--accent-text); border-color: var(--border); }
+.gym-auth-error { color: var(--error); background: var(--background); }
+.gym-auth-message { color: var(--accent-text); background: var(--accent-soft); }
