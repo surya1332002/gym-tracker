@@ -1,10 +1,10 @@
 {
-  "name": "Gym Workout Tracker",
-  "short_name": "GymTracker",
+  "name": "ARC FIT",
+  "short_name": "ARC FIT",
   "start_url": ".",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#000000",
+  "background_color": "#101014",
+  "theme_color": "#ef3340",
   "icons": [
     {
       "src": "/icons/icon-192.png",
@@ -15,20 +15,6 @@
       "src": "/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
-    }
-  ],
-  "screenshots": [
-    {
-      "src": "/screenshots/screen1.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "form_factor": "wide"
-    },
-    {
-      "src": "/screenshots/screen2.png",
-      "sizes": "720x1280",
-      "type": "image/png",
-      "form_factor": "narrow"
     }
   ]
 }

@@ -1,0 +1,12 @@
+.profile-screen { max-width: 680px; margin-inline: auto; min-width: 0; }
+.profile-links { display: grid; gap: 12px; }
+.profile-links a { display: flex; flex-direction: column; gap: 8px; text-decoration: none; color: inherit; min-height: 76px; }
+.profile-links span { font-size: .875rem; }
+.profile-screen .settings-card { margin-block: 16px; min-width: 0; }
+.profile-form { display: grid; gap: 16px; }
+.profile-form label { display: grid; gap: 8px; }
+.profile-form input, .profile-form select { width: 100%; min-width: 0; box-sizing: border-box; min-height: 48px; font-size: 1rem; padding: 10px; color: var(--text); background: var(--surface); border: 1px solid var(--border); border-radius: 8px; }
+.profile-screen button { min-height: 48px; padding: 10px 16px; cursor: pointer; }
+.profile-radio { display: flex; align-items: center; gap: 12px; min-height: 48px; }
+.profile-radio input { width: 20px; height: 20px; }
+.profile-screen p { overflow-wrap: anywhere; }

@@ -1,0 +1,6 @@
+import {useState} from 'react'
+import type {MeasurementField} from './body'
+export default function MeasurementFieldControls({row,busy,first,last,save,move}:{row:MeasurementField;busy:boolean;first:boolean;last:boolean;save:(row:MeasurementField)=>Promise<boolean>;move:(id:string,direction:number)=>Promise<void>}){
+ const [editing,setEditing]=useState(false),[name,setName]=useState(row.name)
+ return <section className="settings-card"><strong>{row.name}</strong>{editing?<form className="profile-form" onSubmit={event=>{event.preventDefault();void save({...row,name}).then(saved=>{if(saved)setEditing(false)})}}><label>Measurement name<input required maxLength={100} disabled={busy} value={name} onChange={event=>setName(event.target.value)} /></label><button disabled={busy}>Save name</button><button type="button" disabled={busy} onClick={()=>setEditing(false)}>Cancel</button></form>:<button disabled={busy} onClick={()=>{setName(row.name);setEditing(true)}}>Rename</button>}<button disabled={busy} onClick={()=>void save({...row,is_hidden:!row.is_hidden})}>{row.is_hidden?'Show field':'Hide field'}</button><button disabled={busy||first} onClick={()=>void move(row.id,-1)}>Move up</button><button disabled={busy||last} onClick={()=>void move(row.id,1)}>Move down</button></section>
+}

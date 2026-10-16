@@ -1,0 +1,18 @@
+import { useEffect, useRef, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import type { PersonalExercise } from '../exercises/personal'
+import { ExercisePicker } from './CompactBuilder'
+import { sessionRepository } from './sessions'
+import type { WorkoutSession } from './sessions'
+import { loadStartLibrary, makeCachedSession, availableActiveWorkouts } from '../../data/startCache'
+import type { StartLibrary } from '../../data/startCache'
+import { workoutStore } from '../../data/workoutStore'
+import { syncWorkouts } from '../../data/workoutSync'
+export default function RandomWorkout({ userId }: { userId: string }) {
+ const [rows,setRows]=useState<PersonalExercise[]>([]),[chosen,setChosen]=useState<PersonalExercise[]>([]),[error,setError]=useState(''),[busy,setBusy]=useState(false),[active,setActive]=useState<any[]>([]),[loading,setLoading]=useState(true)
+ const pending=useRef<WorkoutSession|null>(null),navigate=useNavigate()
+ const [library,setLibrary]=useState<StartLibrary|null>(null),[offline,setOffline]=useState(false)
+ useEffect(()=>{let alive=true;void availableActiveWorkouts(userId).then(local=>{if(alive)setActive(local.map(row=>({id:row.id,routine_name_snapshot:row.session.name})))}).catch(e=>{if(alive)setError(e.message)});void loadStartLibrary(userId).then(async result=>{const local=(await workoutStore.list(userId)).filter(row=>!row.session.completedAt&&!row.session.deletedAt);if(alive){setLibrary(result.library);setOffline(result.offline);setRows(result.library.personal);setActive(local.map(row=>({id:row.id,routine_name_snapshot:row.session.name})))}}).catch(e=>{if(alive)setError(e.message)}).finally(()=>{if(alive)setLoading(false)});return()=>{alive=false}},[userId])
+ async function start(){if(!library||busy)return;setBusy(true);setError('');try{if(navigator.onLine){let cloud:any[]=[];try{cloud=await sessionRepository.list(userId,'in_progress')}catch(e){if(/matching signed-in|another account|account changed|Authentication required/i.test((e as Error).message??''))throw e}if(cloud.some(row=>row.id!==pending.current?.id))throw new Error('Resume your unfinished workout before starting another.')}if(!pending.current)pending.current=makeCachedSession(library,null,null,chosen);const value=await workoutStore.start(pending.current);if(navigator.onLine)void syncWorkouts(userId).catch(()=>{});navigate(`/workout/session/${value.id}`)}catch(e){setError(e instanceof Error?e.message:'Could not start workout. Retry preserves the same session.')}finally{setBusy(false)}}
+ return <div className="compact-workout"><Link className="flow-back" to="/workout/start">Back to Start Workout</Link><h1>Random Workout</h1><p>Choose your own exercises. Add sets in the logger.</p>{offline&&<p role="status">Using your encrypted cached My List.</p>}{error&&<p role="alert">{error}</p>}{active.map(a=><Link className="compact-row" key={a.id} to={`/workout/session/${a.id}`}>Resume {a.routine_name_snapshot}</Link>)}{chosen.map((r,i)=><div className="compact-row" key={r.id}><strong>{i+1}. {r.name}</strong><button className="reset-filters" disabled={busy||!!pending.current} onClick={()=>setChosen(c=>c.filter(x=>x.id!==r.id))}>Remove</button></div>)}{loading?<p role="status">Loading My List-</p>:!pending.current&&<ExercisePicker rows={rows.filter(r=>!r.is_archived&&!chosen.some(c=>c.id===r.id))} close={()=>navigate('/workout/start')} add={r=>setChosen(c=>[...c,r])}/>}<div className="workout-save-bar"><button className="primary-action full-action" disabled={busy||loading||!library||!chosen.length||active.length>0} onClick={()=>void start()}>{busy?'Starting-':pending.current?'Retry start':'Start Workout'}</button></div></div>
+}

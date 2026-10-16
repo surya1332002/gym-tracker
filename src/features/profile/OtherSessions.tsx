@@ -1,0 +1,7 @@
+import {useState} from 'react'
+import {revokeOtherSessions} from './otherSessionsRepository'
+export default function OtherSessions({userId}:{userId:string}){
+ const [confirmed,setConfirmed]=useState(false),[busy,setBusy]=useState(false),[error,setError]=useState(''),[status,setStatus]=useState('')
+ async function revoke(){if(busy)return;setBusy(true);setError('');setStatus('');try{await revokeOtherSessions(userId,confirmed);setConfirmed(false);setStatus('Other device refresh sessions were revoked. This device remains signed in.')}catch(error){setError(error instanceof Error?error.message:'Other sessions could not be revoked.')}finally{setBusy(false)}}
+ return <section className="settings-card profile-form"><h2>Other devices</h2><p>A detailed active-session inventory is not exposed by the current authentication API. You can revoke all other device sessions.</p><label className="profile-radio"><input type="checkbox" checked={confirmed} disabled={busy} onChange={event=>setConfirmed(event.target.checked)} />I want to sign out other devices and keep this device signed in.</label><button disabled={busy||!confirmed} onClick={()=>void revoke()}>{busy?'Revoking other sessions...':'Sign out other devices'}</button><p>Revocation stops future refreshes; existing access tokens remain valid until they expire.</p>{error&&<p role="alert">{error}</p>}{status&&<p role="status">{status}</p>}</section>
+}

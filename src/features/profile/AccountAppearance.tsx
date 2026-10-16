@@ -1,0 +1,10 @@
+import { useEffect, useState } from 'react'
+import { useTheme } from '../../app/ThemeProvider'
+import { settingsRepository } from './settings'
+export function AppearanceSync({userId}:{userId:string}){const {setTheme}=useTheme();useEffect(()=>{let active=true;void settingsRepository.loadTheme(userId).then(theme=>{if(active&&theme)setTheme(theme)}).catch(()=>{});return()=>{active=false}},[userId,setTheme]);return null}
+export default function AccountAppearance({userId}:{userId?:string}){
+ const {theme,setTheme,error:deviceError}=useTheme(),[error,setError]=useState(''),[status,setStatus]=useState(''),[busy,setBusy]=useState(Boolean(userId))
+ useEffect(()=>{let active=true;if(!userId)return;setBusy(true);void settingsRepository.loadTheme(userId).then(saved=>{if(active&&saved)setTheme(saved)}).catch(()=>{if(active)setError('Account appearance could not be loaded. Device theme remains available.')}).finally(()=>{if(active)setBusy(false)});return()=>{active=false}},[userId,setTheme])
+ async function change(next:'light'|'dark'|'system'){if(busy)return;setTheme(next);setError('');setStatus('');if(!userId){setStatus('Saved on this device.');return};setBusy(true);try{await settingsRepository.saveTheme(userId,next);setStatus('Appearance saved to your account and this device.')}catch(error){setError(error instanceof Error?error.message:'Account appearance could not be saved.');setStatus('Applied on this device; account save is pending.')}finally{setBusy(false)}}
+ return <><fieldset className="settings-card"><legend>Theme</legend>{(['light','dark','system'] as const).map(option=><label className="profile-radio" key={option}><input type="radio" name="profile-theme" disabled={busy} checked={theme===option} onChange={()=>void change(option)} />{option[0].toUpperCase()+option.slice(1)}</label>)}</fieldset><p>Choose Light, Dark or System. Account preferences sync across devices after a successful save.</p>{busy&&<p role="status">Loading or saving appearance...</p>}{(error||deviceError)&&<p role="alert">{error||deviceError}</p>}{status&&<p role="status">{status}</p>}</>
+}

@@ -1,9 +1,13 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import AppShell from '../app/AppShell'
 import { supabase } from '../lib/supabase'
 import './auth.css'
+import OfflineAccess from './OfflineAccess'
+import {prepareOnlineDevice} from './deviceAccess'
+import { ensureOnline, isUnlocked, lock, trustedAccounts, type TrustedAccount } from '../data/vault'
+import { workoutStore } from '../data/workoutStore'
 
 function errorMessage(error: unknown) {
   return error instanceof Error ? error.message : 'Unable to connect. Please try again.'
@@ -14,6 +18,13 @@ export default function AuthGate() {
   const [initializing, setInitializing] = useState(true)
   const [sessionError, setSessionError] = useState('')
   const [signingOut, setSigningOut] = useState(false)
+  const [vaultReady, setVaultReady] = useState<string | null>(null)
+  const [vaultError, setVaultError] = useState('')
+  const [offlineUser, setOfflineUser] = useState<TrustedAccount | null>(null)
+  const [offlinePrompt, setOfflinePrompt] = useState(false)
+  const [forceLogin, setForceLogin] = useState(false)
+  const [retryVault, setRetryVault] = useState(0)
+  const currentAuthUser = useRef<string | null>(null)
 
   useEffect(() => {
     let active = true
@@ -25,16 +36,19 @@ export default function AuthGate() {
       setSessionError(callbackError)
       window.history.replaceState(null, '', window.location.pathname)
     }
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, nextSession) => {
       if (!active) return
       authChanged = true
+      if (event === 'SIGNED_OUT' || (nextSession && currentAuthUser.current && currentAuthUser.current !== nextSession.user.id)) { lock(); setVaultReady(null); setOfflineUser(null) }
+      currentAuthUser.current = nextSession?.user.id ?? null
+      if (event === 'SIGNED_IN' || event === 'PASSWORD_RECOVERY') { setForceLogin(false); setOfflinePrompt(false); setOfflineUser(null) }
       setSession(nextSession)
       setInitializing(false)
     })
     void supabase.auth.getSession().then(({ data, error }) => {
       if (!active) return
       if (error) setSessionError(error.message)
-      if (!authChanged) setSession(data.session)
+      if (!authChanged) { currentAuthUser.current = data.session?.user.id ?? null; setSession(data.session) }
       setInitializing(false)
     }).catch((error: unknown) => {
       if (!active) return
@@ -44,13 +58,38 @@ export default function AuthGate() {
     return () => { active = false; subscription.unsubscribe() }
   }, [])
 
+  useEffect(() => {
+    const userId = session?.user.id
+    if (!userId || forceLogin) return
+    let active = true
+    setVaultReady(null); setVaultError('')
+    if (!navigator.onLine) { setVaultError('You are offline. Unlock a trusted device account to continue.'); return }
+    void prepareOnlineDevice(userId, {ensureOnline, encryptLegacy: id => workoutStore.encryptLegacy(id), lock}).then(() => { if (active) { setVaultReady(userId); setOfflineUser(null) } }).catch(error => { if (active) setVaultError(errorMessage(error)) })
+    return () => { active = false }
+  }, [session?.user.id, forceLogin, retryVault])
+  useEffect(() => {
+    const retry = () => setRetryVault(value => value + 1)
+    window.addEventListener('online', retry)
+    return () => window.removeEventListener('online', retry)
+  }, [])
+  useEffect(() => {
+    if (!offlineUser) return
+    let timer: number
+    const expire = () => { const remaining = offlineUser.expiresAt - Date.now(); if (remaining > 0) { timer = window.setTimeout(expire, Math.min(2147483647, remaining)); return } lock(offlineUser.userId); setOfflineUser(null); setOfflinePrompt(true); setVaultError('Trusted offline access expired. Reconnect and sign in.') }
+    expire()
+    return () => window.clearTimeout(timer)
+  }, [offlineUser])
+  function requestLogin() { lock(); setVaultReady(null); setOfflineUser(null); setOfflinePrompt(false); setForceLogin(true) }
+
   async function logout() {
     setSigningOut(true)
     setSessionError('')
     try {
+      const userId = offlineUser?.userId ?? session?.user.id
+      if (userId && await workoutStore.pending(userId)) throw new Error('Sync your device workout changes before signing out. Your encrypted device data is preserved.')
       const { error } = await supabase.auth.signOut({ scope: 'local' })
       if (error) throw error
-      setSession(null)
+      lock(); setVaultReady(null); setOfflineUser(null); setSession(null); setForceLogin(false)
     } catch (error) {
       setSessionError(errorMessage(error))
     } finally { setSigningOut(false) }
@@ -58,10 +97,14 @@ export default function AuthGate() {
 
   if (initializing) return <main className="gym-auth-screen"><div className="gym-auth-card" role="status">Restoring your session…</div></main>
 
-  if (!session) return <AuthForm initialError={sessionError} />
-
-  return <AppShell key={session.user.id} userId={session.user.id} email={session.user.email}
-    logout={() => void logout()} signingOut={signingOut} sessionError={sessionError} />
+  const trusted = (() => { try { return trustedAccounts() } catch { return [] } })()
+  if (offlineUser && isUnlocked(offlineUser.userId)) return <><button className="offline-login-button" onClick={requestLogin}>Sign in to sync</button><AppShell key={offlineUser.userId} userId={offlineUser.userId} email={offlineUser.email} logout={() => void logout()} signingOut={signingOut} sessionError={sessionError || 'Trusted offline access. Sign in again before syncing cloud data.'} /></>
+  if (forceLogin || (!session && !offlinePrompt && (navigator.onLine || !trusted.length))) return <><AuthForm initialError={sessionError} />{trusted.length > 0 && <button className="offline-login-button" onClick={() => { setForceLogin(false); setOfflinePrompt(true) }}>Use trusted offline access</button>}</>
+  if (!session || vaultReady !== session.user.id || !isUnlocked(session.user.id)) {
+    if (session && navigator.onLine && !vaultError && !offlinePrompt) return <main className="gym-auth-screen"><section className="gym-auth-card" role="status">Verifying private device access?</section></main>
+    return <OfflineAccess expectedUserId={session?.user.id} error={vaultError} onUnlock={account => { setOfflineUser(account); setForceLogin(false) }} onRetry={() => { setOfflinePrompt(false); setRetryVault(value => value + 1) }} onLogin={requestLogin} />
+  }
+  return <AppShell key={session.user.id} userId={session.user.id} email={session.user.email} logout={() => void logout()} signingOut={signingOut} sessionError={sessionError} />
 }
 
 function AuthForm({ initialError }: { initialError: string }) {

@@ -1,0 +1,19 @@
+{
+  "provider": "free-exercise-db",
+  "repository": "https://github.com/yuhonas/free-exercise-db",
+  "revision": "f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5",
+  "downloaded_on": "2026-10-10",
+  "dataset_url": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/dist/exercises.json",
+  "license_url": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/LICENSE.md",
+  "image_tree_url": "https://api.github.com/repos/yuhonas/free-exercise-db/git/trees/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5?recursive=1",
+  "tree_truncated": false,
+  "license_declared": "Unlicense",
+  "image_rights_status": "unverified",
+  "sha256": {
+    "exercises.json": "5bb747e3fc658f095a60dcbf6d53c96627acdcc6ffb6fffde86f7e26995d40bf",
+    "schema.json": "9ec09dca20ed4dfe419df81ce4956b5d6ffd2723b266e0c9cdd9b627caa77fb6",
+    "LICENSE.md": "6b0382b16279f26ff69014300541967a356a666eb0b91b422f6862f6b7dad17e",
+    "README.upstream.md": "4b304ffc491993bfbc91a3caf10b395aa5f5d1f0d1b8b38eb92f7afdae30e783",
+    "image-index.json": "9f800f1ea162b7128fdef618374b07ddc184cbb627e5e0a2367696404284d526"
+  }
+}

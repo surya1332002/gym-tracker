@@ -1,2 +1,5 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Preserve pinned public dataset checksums across Windows checkouts.
+data/catalogue/free-exercise-db/** -text

@@ -1,0 +1,12 @@
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { deletedWorkoutRepository, recoveryPeriodMs } from './deletedWorkouts'
+import type { DeletedWorkout } from './deletedWorkouts'
+import { sessionRepository } from '../workout/sessions'
+import './progress.css'
+export default function RecentlyDeleted({ userId }: { userId: string }) {
+  const [rows, setRows] = useState<DeletedWorkout[]>([]), [loading, setLoading] = useState(true), [error, setError] = useState(''), [busy, setBusy] = useState<string | null>(null), [attempt, retry] = useState(0), [message, setMessage] = useState('')
+  useEffect(() => { let current = true; setLoading(true); setRows([]); setError(''); void deletedWorkoutRepository.list(userId).then(data => { if (current) setRows(data) }).catch(e => { if (current) setError(e.message ?? 'Recently Deleted could not be loaded.') }).finally(() => { if (current) setLoading(false) }); return () => { current = false } }, [userId, attempt])
+  async function restore(row: DeletedWorkout) { if (busy) return; setBusy(row.id); setError(''); try { const session = await sessionRepository.load(userId, row.id); await sessionRepository.historyAction(session, 'restore'); setRows(values => values.filter(value => value.id !== row.id)); setMessage(`${row.routine_name_snapshot} restored to workout history.`) } catch (e) { setError((e as Error).message) } finally { setBusy(null) } }
+  return <section><Link to="/workout/history">← Workout history</Link><h1>Recently Deleted</h1><p>Deleted workouts are excluded from progress. Restore them within 30 days; this screen never permanently deletes records.</p>{loading && <p role="status">Loading deleted workouts…</p>}{error && <div role="alert"><p>{error}</p><button onClick={() => retry(n => n + 1)}>Retry</button></div>}{message && <p role="status">{message}</p>}{!loading && !error && !rows.length && <p>No workouts available to restore.</p>}<div className="analytics-grid">{rows.map(row => <article className="analytics-card" key={row.id}><h2>{row.routine_name_snapshot}</h2><p>Workout date: {row.workout_date}</p><p>Recoverable until {new Date(Date.parse(row.deleted_at) + recoveryPeriodMs).toLocaleString()}</p><button type="button" className="primary-button" disabled={busy !== null} onClick={() => void restore(row)}>{busy === row.id ? 'Restoring…' : 'Restore workout'}</button></article>)}</div></section>
+}

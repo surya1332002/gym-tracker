@@ -1,0 +1,9 @@
+import {useState} from 'react'
+import {supabase} from '../../lib/supabase'
+export default function AICoaching({exerciseId}:{exerciseId?:string}){
+ const [consent,setConsent]=useState(false),[busy,setBusy]=useState(false),[answer,setAnswer]=useState(''),[error,setError]=useState('')
+ const provider=import.meta.env?.VITE_AI_PROVIDER_LABEL as string|undefined
+ const enabled=import.meta.env?.VITE_AI_COACHING_ENABLED==='true'&&!!provider
+ async function request(){if(!enabled||!consent||busy)return;setBusy(true);setError('');setAnswer('');try{const {data,error}=await supabase.functions.invoke('training-coach',{body:{exerciseId:exerciseId??null}});if(error)throw error;if(typeof data?.analysis!=='string'||!data.analysis.trim())throw new Error('No analysis was returned.');setAnswer(data.analysis)}catch(e){setError((e as Error).message||'Coaching is unavailable. Your training data was not changed.')}finally{setBusy(false)}}
+ return <section className="analytics-card"><h2>AI coaching (optional)</h2>{enabled?<><p>On request, completed-set records for the selected exercise will be sent through your private Supabase backend to {provider}. The analysis can suggest changes; it cannot edit your workouts or preferences.</p><label><input type="checkbox" checked={consent} onChange={event=>setConsent(event.target.checked)}/>I agree to send these records to {provider} for this analysis.</label></>:<p>AI coaching needs a provider, a server-only API key and deployment of the protected coaching function. No training data is sent automatically.</p>}<button disabled={!enabled||!consent||busy} onClick={()=>void request()}>{busy?'Analyzing recorded sets...':'Request analysis'}</button>{error&&<p role="alert">{error}</p>}{answer&&<p className="exercise-text" style={{whiteSpace:'pre-wrap'}}>{answer}</p>}</section>
+}

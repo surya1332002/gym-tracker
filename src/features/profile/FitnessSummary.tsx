@@ -1,0 +1,7 @@
+import { useEffect, useState } from 'react'
+import { settingsRepository } from './settings'
+export default function FitnessSummary({ userId }: { userId: string }) {
+ const [summary,setSummary] = useState<{completed:number;first:string|null;last:string|null}|null>(null),[error,setError]=useState('')
+ useEffect(()=>{let active=true;void settingsRepository.exportRows(userId,'workouts').then(rows=>{if(!active)return;const dates=rows.filter(row=>row.status==='completed'&&typeof row.completed_at==='string').map(row=>String(row.workout_date)).filter(date=>/^\d{4}-\d{2}-\d{2}$/.test(date)).sort();setSummary({completed:rows.filter(row=>row.status==='completed').length,first:dates[0]??null,last:dates.at(-1)??null})}).catch(()=>{if(active)setError('Workout summary is temporarily unavailable.')});return()=>{active=false}},[userId])
+ return <section className="settings-card"><h2>Fitness summary</h2>{summary ? <><p>{summary.completed} completed workouts recorded.</p>{summary.first && <p>Recorded training: {summary.first} to {summary.last}.</p>}<p>{summary.completed < 12 ? 'Training experience is uncertain: too few recorded workouts for a reliable assessment.' : 'Recorded workouts show training activity; an experience level requires more evidence about consistency and progression.'}</p></> : error ? <p role="alert">{error}</p> : <p role="status">Loading your training summary...</p>}</section>
+}

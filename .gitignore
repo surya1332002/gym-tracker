@@ -23,3 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 .env.local
+# Original personal workout files are local account data.
+data/my-workout/
+data/**/my-workout/

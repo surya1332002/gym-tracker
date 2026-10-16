@@ -4,13 +4,14 @@ import './index.css'
 import AuthGate from './auth/AuthGate.tsx'
 import { BrowserRouter } from 'react-router-dom'
 import { ThemeProvider } from './app/ThemeProvider'
+import AppErrorBoundary from './app/AppErrorBoundary'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <ThemeProvider><BrowserRouter><AuthGate /></BrowserRouter></ThemeProvider>
+    <AppErrorBoundary><ThemeProvider><BrowserRouter><AuthGate /></BrowserRouter></ThemeProvider></AppErrorBoundary>
   </StrictMode>,
 )
-if ('serviceWorker' in navigator) {
+if (import.meta.env.PROD && 'serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/service-worker.js').catch(() => {});
   });

@@ -1,0 +1,17 @@
+import type {SupabaseClient} from '@supabase/supabase-js'
+import {supabase} from '../../lib/supabase'
+import {photoPath,photoBucket,validatePhoto} from '../photos/photos'
+export function createProfileMediaRepository(client:SupabaseClient=supabase){
+ async function account(userId:string){const {data,error}=await client.auth.getSession();if(error)throw error;if(data.session?.user.id!==userId)throw new Error('A matching signed-in account is required.')}
+ function ownedPath(userId:string,path:string){if(!path.startsWith(`${userId}/`)||path.includes('..'))throw new Error('Profile photo belongs to another account.')}
+ async function savePath(userId:string,path:string|null){await account(userId);const {data,error}=await client.from('profiles').update({profile_photo_path:path}).eq('id',userId).select('id,profile_photo_path').single();if(error)throw error;await account(userId);if(data?.id!==userId||data.profile_photo_path!==path)throw new Error('The profile photo save could not be verified.')}
+ return {
+ async privateObjects(userId:string){await account(userId);const bucket=client.storage.from(photoBucket),folders=[userId],paths:string[]=[];for(let index=0;index<folders.length;index++){const folder=folders[index];for(let offset=0;;offset+=100){const {data,error}=await bucket.list(folder,{limit:100,offset,sortBy:{column:'name',order:'asc'}});if(error)throw error;for(const item of data??[]){if(!item.name||item.name.includes('/')||item.name.includes('..'))throw new Error('A private storage reference is invalid.');const path=`${folder}/${item.name}`;ownedPath(userId,path);if(item.id===null)folders.push(path);else paths.push(path)}if(!data||data.length<100)break}}await account(userId);return paths},
+ async read(userId:string){await account(userId);const {data,error}=await client.from('profiles').select('id,profile_photo_path').eq('id',userId).single();if(error)throw error;await account(userId);if(data?.id!==userId)throw new Error('Profile photo belongs to another account.');if(data.profile_photo_path)ownedPath(userId,data.profile_photo_path);return data.profile_photo_path as string|null},
+ async upload(userId:string,id:string,file:File){await account(userId);await validatePhoto(file);const path=photoPath(userId,`profile-${id}`,file.type),bucket=client.storage.from(photoBucket);const upload=await bucket.upload(path,file,{contentType:file.type,upsert:false});if(upload.error){if(String(upload.error.statusCode)!=='409'&&!/already exists|duplicate/i.test(upload.error.message))throw upload.error;const original=await bucket.download(path);if(original.error)throw original.error;const a=new Uint8Array(await original.data.arrayBuffer()),b=new Uint8Array(await file.arrayBuffer());if(a.length!==b.length||a.some((value,index)=>value!==b[index]))throw new Error('An existing original profile photo differs. It was preserved.')}await savePath(userId,path);return path},
+ async remove(userId:string){await savePath(userId,null)},
+ async signedUrl(userId:string,path:string){await account(userId);ownedPath(userId,path);const {data,error}=await client.storage.from(photoBucket).createSignedUrl(path,600);if(error)throw error;await account(userId);return data.signedUrl},
+ async original(userId:string,path:string){await account(userId);ownedPath(userId,path);const {data,error}=await client.storage.from(photoBucket).download(path);if(error)throw error;await account(userId);return data}
+ }
+}
+export const profileMediaRepository=createProfileMediaRepository()

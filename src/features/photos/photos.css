@@ -1,0 +1,11 @@
+.photo-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-top:16px; }
+.photo-grid article { min-width:0; overflow-wrap:anywhere; }
+.photo-grid img { width:100%; aspect-ratio:3/4; object-fit:contain; background:var(--background); border-radius:8px; }
+.photo-grid button { width:100%; margin-block:4px; }
+.photo-comparison { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-block:16px; }
+.photo-frame { overflow:hidden; aspect-ratio:3/4; background:var(--background); }
+.photo-frame img { width:100%; height:100%; object-fit:contain; transform-origin:center; }
+.photo-overlay { position:relative; margin-block:16px; }
+.photo-overlay .photo-frame { width:100%; }
+.photo-overlay .photo-frame img { width:100%; height:100%; }
+.profile-screen textarea { min-height:96px; width:100%; font:inherit; color:var(--text); background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:10px; }

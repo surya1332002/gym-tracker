@@ -65,3 +65,4 @@
 .gym-auth-secondary { background: var(--surface); color: var(--accent-text); border-color: var(--border); }
 .gym-auth-error { color: var(--error); background: var(--background); }
 .gym-auth-message { color: var(--accent-text); background: var(--accent-soft); }
+.offline-login-button { position:fixed; right:12px; top:12px; z-index:120; max-width:45vw; font-size:.8rem; min-height:44px; color:var(--text); background:var(--surface); border:1px solid var(--border); }

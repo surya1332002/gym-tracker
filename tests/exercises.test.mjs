@@ -6,7 +6,7 @@ import { readFileSync } from 'node:fs'
 import React from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 
-const bundle = await build({ stdin: { contents: "export * from './src/features/exercises/catalogue'; export {CatalogueFeedback} from './src/features/exercises/ExerciseLibrary';", resolveDir: process.cwd(), loader: 'tsx' }, bundle: true, write: false, format: 'cjs', platform: 'node', packages: 'external', jsx: 'automatic', loader: { '.css': 'empty' } })
+const bundle = await build({ stdin: { contents: "export * from './src/features/exercises/catalogue'; export {CatalogueFeedback} from './src/features/exercises/ExerciseLibrary';", resolveDir: process.cwd(), loader: 'tsx' }, bundle: true, write: false, format: 'cjs', platform: 'node', packages: 'external', jsx: 'automatic', loader: { '.css': 'empty' }, plugins: [{ name: 'mock-client', setup(builder) { builder.onResolve({ filter: /(?:^|\/)supabase$/ }, () => ({ path: 'mock', namespace: 'fixture' })); builder.onLoad({ filter: /.*/, namespace: 'fixture' }, () => ({ contents: 'export const supabase = {};' })) } }] })
 const module = { exports: {} }
 new Function('require', 'module', 'exports', bundle.outputFiles[0].text)(createRequire(import.meta.url), module, module.exports)
 const { starterCatalogue, filterExercises, UNKNOWN_EQUIPMENT, requestCatalogue, CatalogueFeedback } = module.exports

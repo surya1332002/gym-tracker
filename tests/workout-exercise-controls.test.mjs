@@ -1,0 +1,35 @@
+import assert from 'node:assert/strict'
+import { test } from 'node:test'
+import { build } from 'esbuild'
+import { createRequire } from 'node:module'
+const output = await build({ stdin: { contents: "export * from './src/features/workout/WorkoutExerciseControls'; export * from './src/features/workout/routineReplacement';", resolveDir: process.cwd(), loader: 'tsx' }, bundle: true, write: false, format: 'cjs', platform: 'node', packages: 'external', jsx: 'automatic', plugins: [{ name: 'fixture', setup(b) { b.onResolve({ filter: /(?:^|\/)supabase$/ }, () => ({ path: 'fixture-client', external: true })) } }] })
+const module = { exports: {} }, require = createRequire(import.meta.url); new Function('require', 'module', 'exports', output.outputFiles[0].text)(name => name === 'fixture-client' ? { supabase: {} } : require(name), module, module.exports)
+const { applyWorkoutPreferences, needsWeightPreferenceSetup, selectWorkoutPreset, replacementDraft, createRoutineReplacementRepository } = module.exports
+const replacement = { id: 'replacement', user_id: 'own', name: 'New cable movement', is_archived: false }
+const draft = { name: 'PPL', split: 'Custom', muscles: [], days: [{ name: 'Push A', exercises: [{ exerciseId: 'original', name: 'Original', sets: null, min: null, max: null, startingWeightLb: '100', group: { id: 'g', type: 'superset' }, perSetReps: [8, 9] }, { exerciseId: 'other', name: 'Other', sets: 3, min: 8, max: 12 }] }, { name: 'Pull A', exercises: [{ exerciseId: 'row', name: 'Row', sets: 2, min: 10, max: 12 }] }] }
+test('first-use preferences retain exact canonical loads and completed attribution without invented increment', () => {
+  const exercise = { exerciseId: 'original', sets: [{ weightKg: 17.123456789, lb: '37.751633', reps: '9', completed: true }], unit: undefined, increment: null }, original = structuredClone(exercise)
+  const changed = applyWorkoutPreferences(exercise, 'kg', ''); assert.equal(changed.unit, 'kg'); assert.equal(changed.increment, null); assert.equal(changed.savePreferences, true); assert.equal(changed.preferencesConfigured, true); assert.equal(needsWeightPreferenceSetup(changed), false); assert.equal(needsWeightPreferenceSetup(exercise), true); assert.deepEqual(changed.sets, original.sets); assert.deepEqual(exercise, original)
+  assert.equal(applyWorkoutPreferences(exercise, 'lb', '2.5').increment, 2.5); assert.throws(() => applyWorkoutPreferences(exercise, 'kg', '0'), /positive/)
+})
+test('preset selection stores one owned exact snapshot and later preset mutations cannot alter the snapshot', () => {
+  const exercise = { exerciseId: 'original', sets: [{ lb: '100', reps: '10', completed: true }], settings: [] }, preset = { id: 'preset', user_id: 'own', exercise_id: 'original', label: 'Seat 4', other_settings: { pin: '6' } }
+  const changed = selectWorkoutPreset(exercise, preset, 'own'); preset.other_settings.pin = '8'; assert.equal(changed.settings.length, 1); assert.equal(changed.settings[0].other_settings.pin, '6'); assert.equal(changed.selectedPresetId, 'preset'); assert.deepEqual(changed.sets, exercise.sets)
+  assert.throws(() => selectWorkoutPreset(exercise, { ...preset, user_id: 'foreign' }, 'own'), /belonging/); assert.throws(() => selectWorkoutPreset(exercise, { ...preset, exercise_id: 'other' }, 'own'), /belonging/); assert.deepEqual(selectWorkoutPreset(changed, null, 'own').settings, [])
+})
+test('permanent replacement preserves other days/order and blank targets while clearing movement-specific starting load', () => {
+  const original = structuredClone(draft), next = replacementDraft(draft, { name: 'Push A', sequence_number: 1 }, 'original', replacement)
+  assert.deepEqual(draft, original); assert.deepEqual(next.days[1], original.days[1]); assert.deepEqual(next.days[0].exercises[1], original.days[0].exercises[1]); assert.equal(next.days[0].exercises[0].exerciseId, replacement.id); assert.equal(next.days[0].exercises[0].sets, null); assert.equal(next.days[0].exercises[0].min, null); assert.equal(next.days[0].exercises[0].startingWeightLb, ''); assert.deepEqual(next.days[0].exercises[0].perSetReps, [8, 9]); assert.deepEqual(next.days[0].exercises[0].group, original.days[0].exercises[0].group)
+})
+test('changed days, ambiguous duplicate slots and archived replacements require explicit programme editing', () => {
+  assert.throws(() => replacementDraft(draft, { name: 'Different name', sequence_number: 1 }, 'original', replacement), /changed|ambiguous/)
+  const duplicate = structuredClone(draft); duplicate.days[0].exercises.push(duplicate.days[0].exercises[0]); assert.throws(() => replacementDraft(duplicate, { name: 'Push A', sequence_number: 1 }, 'original', replacement), /ambiguous/)
+  assert.throws(() => replacementDraft(draft, { name: 'Push A', sequence_number: 1 }, 'original', { ...replacement, is_archived: true }), /active exercise/)
+})
+test('permanent retry preserves revision/save identity and conflicts do not mutate current session or programme draft', async () => {
+  const calls = [], current = { id: 'programme', user_id: 'own', revision: 4 }, session = { dayId: 'retained', exercises: [{ exerciseId: 'original', sets: [{ completed: true, lb: '100', reps: '10' }] }] }, originalSession = structuredClone(session)
+  const query = { select() { return this }, eq() { return this }, single: async () => ({ data: { id: 'retained', user_id: 'own', programme_id: current.id, name: 'Push A', sequence_number: 1 }, error: null }) }, client = { auth: { getSession: async () => ({ data: { session: { user: { id: 'own' } } } }) }, from: () => query }, programmes = { listProgrammes: async () => [current], loadProgramme: async () => draft, saveProgramme: async (...args) => { calls.push(structuredClone(args)); throw Object.assign(new Error('Revision conflict'), { code: '40001' }) } }
+  const repo = createRoutineReplacementRepository(client, programmes), attempt = await repo.prepare('own', session.dayId, 'original', replacement)
+  await assert.rejects(repo.save(attempt), /conflict/); await assert.rejects(repo.save(attempt), /conflict/); assert.deepEqual(calls[0], calls[1]); assert.equal(calls[0][2], 4); assert.deepEqual(session, originalSession); assert.equal(draft.days[0].exercises[0].exerciseId, 'original')
+})
+test('blank increments are configured once and do not force setup on later workouts',()=>{assert.equal(needsWeightPreferenceSetup({preferencesConfigured:true,increment:null}),false);assert.equal(needsWeightPreferenceSetup({preferencesConfigured:false,increment:2.5}),true);assert.equal(needsWeightPreferenceSetup({preferencesConfigured:false},true),false);const exercise={exerciseId:'owned',preferencesConfigured:true,increment:null,unit:'lb',sets:[{weightKg:45.1234567890123,lb:'99.482122',reps:'8',completed:true}],settings:[]};const changed=applyWorkoutPreferences(exercise,'kg','');assert.equal(changed.preferencesConfigured,true);assert.equal(changed.increment,null);assert.deepEqual(changed.sets,exercise.sets);assert.equal(needsWeightPreferenceSetup(changed),false)})
