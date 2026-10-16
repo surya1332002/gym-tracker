@@ -178,3 +178,8 @@ This update supersedes the earlier pending UI-reviewer test status and next acti
 - **Checks not executed:** No QA-agent spawn, application tests/builds, browser testing, database checks, installations or runtime-discovery diagnostics. This was configuration validation, not feature QA or a repository/Supabase audit.
 - **Current stage and limitations:** Environment setup remains In Progress; application implementation phases remain Not Started. `docs/UI_DESIGN.md` is absent; the role consults it only when available.
 - **Pending decision and next exact action:** Stop for approval of this configuration step. After separate authorisation, verify fresh-session discovery and perform a small read-only native delegation test of `gym-qa-reviewer` with `fork_turns: "none"`. Do not automatically begin an audit or application development.
+
+
+## Integrated ARC FIT implementation ? 2026-10-16
+
+The approved integrated features and additive migrations are implemented on develop. See docs/APPLICATION_IMPLEMENTATION.md for verified functionality, preservation evidence and activation limits. Final 226 local tests and 212 clean-snapshot public tests passed; TypeScript and production builds passed. No production deployment. Private local import data and prior working-tree changes remain preserved.

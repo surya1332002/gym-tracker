@@ -106,3 +106,8 @@ This coverage does not invent absent column definitions. Recover the complete sc
 ## Approval and Verification Boundary
 
 See [Phase 0 draft](plans/PHASE_0_FOUNDATION_DRAFT.md). No SQL/migrations are included here. Any future schema capture or database testing requires separately authorised access; production changes require reviewed migration scope and approval. Cross-account and reassignment tests must run in isolation before gateway production use. Protect existing data and obtain a recovery method before changes. No account, photo or workout deletion is authorised by planning.
+
+
+## Integrated contracts ? verified 2026-10-16
+
+Migrations 20261010_02/03 and 20261011_01 through 10 are applied to the existing project through authorized SQL Editor transactions. They add private references, atomic workout revisions/retry receipts, optional targets/group metadata, owned device keys, weekly targets, measurement/private media records, incomplete classification, exact numeric storage and explicit exercise preferences. Rollback-only owner/isolation/replay checks passed. No real workout completions or catalogue edits were created for testing. Purge service contracts are applied; the scheduled worker is not deployed or enabled. See APPLICATION_IMPLEMENTATION.md and ACCOUNT_RECOVERY_BACKEND.md for verification limits.

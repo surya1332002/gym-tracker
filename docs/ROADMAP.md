@@ -70,3 +70,8 @@ Allowed status values: Not Started, In Progress, Blocked, Completed.
 - **Scope:** Cross-screen consistency, mobile/desktop QA, offline recovery, permissions, empty/loading/error states, accessibility, performance and final regression testing.
 - **Dependencies:** Phases 0–5 accepted; complete requirement traceability, suitable test data and approved release criteria.
 - **Acceptance criteria:** Critical end-to-end workflows run successfully; offline/reconnect and competing edits do not lose or duplicate records; private data/media access is verified; UI follows confirmed decisions on mobile and desktop; calculation/integration/regression checks pass; remaining issues and release readiness are explicitly reviewed.
+
+
+## Integrated milestone ? 2026-10-16
+
+Workout engine, exercise management, strength/history/calendar, body/cardio/photos, Home/Profile and encrypted offline/retry workflows are implemented and regression-tested. Final 212 public clean-snapshot tests, TypeScript and production build passed. Production deployment remains unauthorized. Remaining blocked activation: trusted HTTPS for phone cold-start offline/PWA; approved purge-function deployment/secrets/schedule; optional AI provider credentials/protected deployment; individual-session inventory/revocation requires an additional scoped backend capability. See APPLICATION_IMPLEMENTATION.md.

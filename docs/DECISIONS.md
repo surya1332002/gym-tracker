@@ -187,3 +187,8 @@ The 30-day workout-trash window and 30-day account-recovery window do not establ
 - **Decision:** Near-black backgrounds, charcoal cards, vivid red primary actions and highlights, white text; coordinated red-accented light mode with persistent Light/Dark/System support. Preserve the approved shell layout.
 - **Source:** Latest user instruction for this milestone expressly supersedes the Forest Teal accent in MASTER_SPEC section 7.3 for appearance only. MASTER_SPEC itself remains unchanged; no other product behaviour or GT-012–GT-017 direction changes.
 - **Implementation:** Separate accessible text-accent colours from the primary action red. No catalogue provider, media licence or personal exercise schema is selected by this milestone.
+
+
+## Integrated milestone decisions ? 2026-10-16
+
+Retain red/black ARC FIT navigation and the approved compact tile/day flows. Optional targets remain NULL; recorded canonical loads retain precision. Exercise identity and original snapshots survive replacement/editing. Encrypt account-scoped device workout/draft/outbox/conflict payloads with independent record authentication; fail closed when trusted keys cannot be recovered. Internal replay receipts/device keys are excluded from exports. Preserve pinned public dataset bytes across Windows checkout. Do not enable deletion or AI UI actions before their backend capabilities are configured and verified. No production deployment authorized.

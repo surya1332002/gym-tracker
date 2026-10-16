@@ -2,4 +2,4 @@
 * text=auto
 
 # Preserve pinned public dataset checksums across Windows checkouts.
-data/catalogue/free-exercise-db/** -text
+data/catalogue/free-exercise-db/** -text whitespace=cr-at-eol
