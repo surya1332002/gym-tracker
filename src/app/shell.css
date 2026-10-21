@@ -1,15 +1,15 @@
 .app-shell { position: fixed; inset: 0; height: var(--app-height, 100dvh); overflow: hidden; background: var(--background); }
 .shell-sidebar { display: none; }
-.shell-header { position: fixed; inset: 0 0 auto; height: calc(68px + var(--safe-top)); padding: var(--safe-top) var(--safe-right) 0 var(--safe-left); border-bottom: 1px solid #38383e; display: flex; align-items: center; justify-content: center; background: var(--chrome-background); z-index: 10; isolation: isolate; }
+.shell-header { position: fixed; inset: 0 0 auto; height: calc(var(--header-height) + var(--safe-top)); padding: var(--safe-top) var(--safe-right) 0 var(--safe-left); border-bottom: 1px solid #38383e; display: flex; align-items: center; justify-content: center; background: var(--chrome-background); z-index: 10; isolation: isolate; }
 .shell-header::after { content: ''; position: absolute; right: 16px; bottom: 7px; width: 29%; max-width: 180px; height: 10px; border-right: 1px solid #57575f; border-bottom: 1px solid #57575f; transform: skewX(-25deg); z-index: -1; pointer-events: none; }
 .arc-brand { font-weight: 850; letter-spacing: .22em; color: #f5f5f5; font-size: 1.25rem; }
 .arc-brand span:first-child { color: #e11d2e; }
 .arc-brand:hover { text-decoration: none; }
-.future-menu { position: absolute; left: max(12px, env(safe-area-inset-left)); top: calc(12px + env(safe-area-inset-top)); width: 44px; height: 44px; padding: 12px; color: #a5a5af; background: transparent; border: 1px solid #38383e; border-radius: 5px 12px 5px 5px; }
+.future-menu { position: absolute; left: max(12px, env(safe-area-inset-left)); top: calc((var(--header-height) - 44px) / 2 + var(--safe-top)); width: 44px; height: 44px; padding: 12px; color: #a5a5af; background: transparent; border: 1px solid #38383e; border-radius: 5px 12px 5px 5px; }
 .future-menu:disabled { opacity: 1; cursor: not-allowed; }
 .future-menu i { display: block; height: 1px; width: 18px; background: currentColor; margin: 4px 0; }
 .future-menu i:nth-child(2) { width: 13px; }
-.shell-body { height: 100%; padding-top: calc(68px + var(--safe-top)); padding-bottom: calc(var(--dock-height) + var(--safe-bottom)); overflow: hidden; }
+.shell-body { height: 100%; padding-top: calc(var(--header-height) + var(--safe-top)); padding-bottom: calc(var(--dock-height) + var(--safe-bottom)); overflow: hidden; }
 .mobile-brand { font-weight: 800; color: var(--text); letter-spacing: -.03em; }
 .account-actions { display: flex; align-items: center; gap: 14px; margin-left: auto; min-width: 0; }
 .account-link { font-size: .85rem; overflow-wrap: anywhere; color: var(--muted); }
@@ -29,7 +29,7 @@
 .mobile-dock { position: fixed; bottom: calc(var(--keyboard-offset) + var(--safe-bottom)); left: 0; right: 0; height: var(--dock-height); background: var(--chrome-background); color: #f5f5f5; border-top: 1px solid #38383e; z-index: 10; }
 /* Paint beneath the gesture area without covering or hiding Android controls. */
 .mobile-dock::after { content: ''; position: absolute; left: 0; right: 0; top: 100%; height: var(--safe-bottom-max); background: var(--chrome-background); pointer-events: none; }
-.mobile-dock .shell-nav { padding-left: max(8px, var(--safe-left)); padding-right: max(8px, var(--safe-right)); }
+.mobile-dock .shell-nav { padding: 4px max(8px, var(--safe-right)) 4px max(8px, var(--safe-left)); }
 .mobile-dock .shell-nav a { color: #b6b6c0; }
 .mobile-dock .shell-nav a[aria-current='page'] { color: #ff6673; background: #35191f; }
 .shell-nav { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); padding: 8px; gap: 4px; }
@@ -79,6 +79,12 @@
 .shell-main { padding-bottom:150px; }
 .shell-main { padding-left: max(24px, var(--safe-left)); padding-right: max(24px, var(--safe-right)); scroll-padding-bottom: 150px; }
 .active-workout-bar { bottom: calc(var(--keyboard-offset) + var(--dock-height) + var(--safe-bottom) + 8px); left: max(8px, var(--safe-left)); right: max(8px, var(--safe-right)); }
-.app-shell:has(.active-workout-bar) .workout-save-bar { bottom: calc(142px + var(--safe-bottom)); }
+.app-shell:has(.active-workout-bar) .workout-save-bar { bottom: calc(var(--dock-height) + 73px + var(--safe-bottom)); }
+@media(max-width:899px) {
+  .app-shell { --header-height: 56px; }
+  .shell-header::after { bottom: 6px; }
+  .shell-main { padding-top: 20px; }
+  .shell-main > h1:first-child, .shell-main > section > h1:first-child { margin-top: 0; }
+}
 @media(max-width:360px) { .shell-main { padding-left: max(16px, var(--safe-left)); padding-right: max(16px, var(--safe-right)); } }
 @media(min-width:900px) { .shell-main { padding-left: max(40px, var(--safe-left)); padding-right: max(40px, var(--safe-right)); } .active-workout-bar { left:268px; bottom:12px; max-width:700px; } .app-shell:has(.active-workout-bar) .workout-save-bar { bottom:90px; } }
