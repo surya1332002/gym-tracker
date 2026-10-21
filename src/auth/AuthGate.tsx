@@ -167,9 +167,9 @@ function AuthForm({ initialError }: { initialError: string }) {
 
   return <main className="gym-auth-screen">
     <section className="gym-auth-card" aria-labelledby="gym-auth-title">
-      <div className="gym-auth-brand">GYM TRACKER</div>
+      <div className="gym-auth-brand"><img src="/icons/arc-fit.svg" width="40" height="40" alt="" /> ARC FIT</div>
       <h1 id="gym-auth-title">{mode === 'login' ? 'Welcome back' : 'Start your next chapter'}</h1>
-      <p className="gym-auth-intro">{mode === 'login' ? 'Log in to open Gym Tracker.' : 'Create an account with your email and password.'}</p>
+      <p className="gym-auth-intro">{mode === 'login' ? 'Log in to open ARC FIT.' : 'Create an account with your email and password.'}</p>
       <div className="gym-auth-modes" aria-label="Account access">
         {(['login', 'signup'] as const).map(value => <button key={value} type="button" aria-pressed={mode === value} disabled={busy} onClick={() => {
           setMode(value); setError(''); setMessage(''); setPassword(''); setNeedsConfirmation(false)
@@ -186,7 +186,7 @@ function AuthForm({ initialError }: { initialError: string }) {
         <button className="gym-auth-primary" type="submit" disabled={busy}>{busy ? 'Please wait…' : mode === 'login' ? 'Log in' : 'Create account'}</button>
       </form>
       {needsConfirmation && <button className="gym-auth-resend" type="button" disabled={busy || !email.trim()} onClick={() => void resend()}>Resend confirmation email</button>}
-      <p className="gym-auth-footnote">Your private training space. Workout logging is coming soon.</p>
+      <p className="gym-auth-footnote">Your private training space. Build, log and review your workouts.</p>
     </section>
   </main>
 }

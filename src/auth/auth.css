@@ -5,10 +5,10 @@
   box-sizing: border-box;
   display: grid;
   place-items: center;
-  padding: 32px 20px;
-  background: radial-gradient(ellipse at top, #e5f0e9, #f4f6f4 65%);
-  color: #17291f;
-  color-scheme: light;
+  padding: max(32px, var(--safe-top)) max(20px, var(--safe-right)) max(32px, var(--safe-bottom)) max(20px, var(--safe-left));
+  background: var(--chrome-background);
+  color: var(--text);
+  color-scheme: dark;
 }
 .gym-auth-card {
   width: 100%;
@@ -66,3 +66,6 @@
 .gym-auth-error { color: var(--error); background: var(--background); }
 .gym-auth-message { color: var(--accent-text); background: var(--accent-soft); }
 .offline-login-button { position:fixed; right:12px; top:12px; z-index:120; max-width:45vw; font-size:.8rem; min-height:44px; color:var(--text); background:var(--surface); border:1px solid var(--border); }
+.gym-auth-screen { padding-top: max(32px, var(--safe-top)); padding-bottom: max(32px, var(--safe-bottom)); padding-left: max(16px, var(--safe-left)); padding-right: max(16px, var(--safe-right)); }
+.gym-auth-brand { display: flex; align-items: center; gap: 10px; }
+.offline-login-button { top: calc(12px + var(--safe-top)); right: max(12px, var(--safe-right)); }

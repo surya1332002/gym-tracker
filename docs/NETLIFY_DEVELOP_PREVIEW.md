@@ -1,8 +1,12 @@
 # ARC FIT HTTPS development preview
 
-Status: local configuration prepared; Netlify authorization is required. No preview URL has been created or verified. The existing production site and main branch have not been changed.
+Status: the separate development site is https://arc-fit.netlify.app, linked to `develop`. Its project ID is `1b2f1fc0-9cb1-41ca-9602-281d5e61bfae`. The original production site and main branch remain separate and untouched.
 
-Local verification on 2026-10-20: 19 preview/auth-device/encrypted-workout/offline tests passed; TypeScript passed; the guarded develop preview production build passed using public Supabase configuration. Generated release-cache coverage, manifest/icons and private-marker checks passed. Netlify showed its login page, with no local Netlify CLI token/project link available. No Git push, hosted deployment, Supabase settings change or real workout write occurred.
+The Android presentation follow-up verified GitHub develop at `0a955c0` and the development site's published deployment at that same commit. An already-open browser tab still displayed foundation commit `286ed28`; a normal refresh loaded the complete authenticated ARC FIT UI without clearing storage. Current builds expose `/build-info.json` with only the application, branch and source commit, so the served version can be checked directly. Revalidation headers cover this identifier, the HTML, manifest and service worker.
+
+Current PWA assets use original ARC FIT icons, standalone/root identity, dark chrome, edge-to-edge viewport and safe-area-aware navigation. Existing encrypted offline records are not reset or migrated by presentation changes. Existing tabs/PWA windows may need to be closed and reopened for a waiting worker to activate; installed icon/manifest updates follow the browser's own schedule. Do not clear site data to force an update. Android system navigation remains under Android's control.
+
+Earlier setup verification on 2026-10-20: 19 preview/auth-device/encrypted-workout/offline tests, TypeScript and the guarded preview build passed. Authorization was blocked at that point; this was resolved by the subsequent development-site setup. Android follow-up: 232 local tests pass, including PNG dimensions/maskable safe-circle checks, branding/manifest/inset checks and existing offline regressions. TypeScript and guarded production build pass. No real workout writes or Supabase settings changes were performed for presentation verification. A physical installed Android device was not controlled by the automated checks.
 
 ## One-time Netlify steps
 
@@ -37,6 +41,6 @@ If the repo has not already been authorized for this Netlify account, stop at th
 
 The existing React Router `/* -> /index.html` rewrite and service-worker `Cache-Control: no-cache` rule remain in `netlify.toml`. No Netlify CLI linking state, auth token, private CSV or environment file should be committed or uploaded.
 
-Live HTTPS authentication, session persistence, workout loading, phone installation and offline recovery remain **unverified until Netlify login/site creation and user login/device setup are complete**. Local fixture tests or successful builds are not substituted for those live checks.
+Live HTTPS session restoration and the complete dashboard were verified on the separate development site. Phone installation and native Android system-bar rendering require device verification. Real offline editing/completion is intentionally not tested against personal workouts; encrypted recovery/retry tests use isolated fixtures. Local fixtures or successful builds are not substituted for physical phone checks.
 
 References: [Netlify Vite build setup](https://docs.netlify.com/build/frameworks/framework-setup-guides/vite/), [Netlify deploy contexts](https://docs.netlify.com/build/configure-builds/file-based-configuration/), [Supabase redirect URLs](https://supabase.com/docs/guides/auth/redirect-urls).

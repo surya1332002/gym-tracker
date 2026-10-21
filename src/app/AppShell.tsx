@@ -39,7 +39,7 @@ export default function AppShell({ userId, email, logout, signingOut, sessionErr
   const location = useLocation()
   const main = useRef<HTMLElement>(null)
   useEffect(() => {
-    document.title = `${destinations.find(item => item.path === location.pathname || (item.path !== '/' && location.pathname.startsWith(`${item.path}/`)))?.title ?? 'Page not found'} · Gym Tracker`
+    document.title = `${destinations.find(item => item.path === location.pathname || (item.path !== '/' && location.pathname.startsWith(`${item.path}/`)))?.title ?? 'Page not found'} · ARC FIT`
     main.current?.focus({ preventScroll: true })
     main.current?.scrollTo(0, 0)
   }, [location.pathname])
@@ -51,7 +51,7 @@ export default function AppShell({ userId, email, logout, signingOut, sessionErr
   }, [])
   return <WorkoutDraftProvider userId={userId}><div className="app-shell">
     <AppearanceSync userId={userId}/><a className="skip-link" href="#main-content">Skip to content</a>
-    <aside className="shell-sidebar"><Link className="brand" to="/" aria-label="ARC FIT home"><span className="brand-mark" aria-hidden="true">GT</span><span>ARC FIT<small>Make room for progress.</small></span></Link>
+    <aside className="shell-sidebar"><Link className="brand" to="/" aria-label="ARC FIT home"><img className="brand-mark" src="/icons/arc-fit.svg" alt="" /><span>ARC FIT<small>Make room for progress.</small></span></Link>
       <Navigation />
     </aside>
     <div className="shell-body">

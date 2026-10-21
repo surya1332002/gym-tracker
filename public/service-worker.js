@@ -1,5 +1,5 @@
 ﻿const CACHE = 'gym-tracker-shell-v2';
-const ASSETS = ['/index.html', '/manifest.json', '/icons/icon-192.png', '/icons/icon-512.png'];
+const ASSETS = ['/index.html', '/manifest.json', '/icons/arc-fit.svg', '/icons/arc-fit-192.png', '/icons/arc-fit-512.png', '/icons/arc-fit-maskable-512.png'];
 
 // Wait for old tabs to close before activation; do not mix releases mid-session.
 self.addEventListener('install', event => {
