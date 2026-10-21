@@ -6,8 +6,8 @@ import { inflateSync } from 'node:zlib'
 test('ARC FIT manifest has stable root identity, standalone display and matching dark launch chrome', () => {
   const manifest=JSON.parse(readFileSync('public/manifest.json','utf8')), html=readFileSync('index.html','utf8')
   assert.equal(manifest.name,'ARC FIT');assert.equal(manifest.id,'/');assert.equal(manifest.start_url,'/');assert.equal(manifest.scope,'/');assert.equal(manifest.display,'standalone')
-  assert.equal(manifest.background_color,'#0b0b0d');assert.equal(manifest.theme_color,'#0b0b0d')
-  assert.match(html,/viewport-fit=cover/);assert.match(html,/<meta name="theme-color" content="#0b0b0d"/);assert.match(html,/\/icons\/arc-fit\.svg/)
+  assert.equal(manifest.background_color,'#000000');assert.equal(manifest.theme_color,'#000000')
+  assert.match(html,/viewport-fit=cover/);assert.match(html,/<meta name="theme-color" content="#000000"/);assert.match(html,/\/icons\/arc-fit\.svg/)
   assert.ok(!html.includes('vite.svg'));assert.ok(!html.includes('cdn.tailwindcss.com'))
 })
 test('actual PNG assets match declared sizes and keep all artwork inside Android maskable safe circle', () => {

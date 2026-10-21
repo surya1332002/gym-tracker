@@ -1,5 +1,5 @@
 :root {
-  --chrome-background: #0b0b0d;
+  --chrome-background: #000000;
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-right: env(safe-area-inset-right, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
