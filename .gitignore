@@ -23,6 +23,8 @@ dist-ssr
 *.sln
 *.sw?
 .env.local
+# Netlify project links and local CLI state must not select a site for others.
+.netlify/
 # Original personal workout files are local account data.
 data/my-workout/
 data/**/my-workout/

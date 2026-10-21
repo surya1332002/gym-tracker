@@ -183,3 +183,8 @@ This update supersedes the earlier pending UI-reviewer test status and next acti
 ## Integrated ARC FIT implementation ? 2026-10-16
 
 The approved integrated features and additive migrations are implemented on develop. See docs/APPLICATION_IMPLEMENTATION.md for verified functionality, preservation evidence and activation limits. Final 226 local tests and 212 clean-snapshot public tests passed; TypeScript and production builds passed. No production deployment. Private local import data and prior working-tree changes remain preserved.
+
+
+## HTTPS develop preview setup - 2026-10-20
+
+Prepared a develop-only Netlify build context and guarded public-configuration build script, retaining the default/main Vite build, SPA fallback and service-worker cache policy. See docs/NETLIFY_DEVELOP_PREVIEW.md for exact separate-project and public-variable setup. Local 19 relevant tests, TypeScript and guarded production build passed. Netlify is signed out and local Netlify credentials/project link are absent; no preview URL exists, so hosted authentication/session/workout/PWA/offline checks remain unverified. No production deployment, main merge, Git push, Supabase settings change or real workout write occurred. Next action: user signs into Netlify; create a separate develop project and configure only the two public Supabase variables.
