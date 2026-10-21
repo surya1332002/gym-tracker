@@ -19,7 +19,7 @@ import TrustedDeviceSettings from './TrustedDeviceSettings'
 import { OptionalPersonalFields, TrainingFieldsForm } from './PreferenceForms'
 
 const sections = [{ path: 'personal', name: 'Personal information', description: 'Your name, timezone and units' }, { path: 'training', name: 'Training preferences', description: 'Rotation, targets and logging' }, { path: 'appearance', name: 'Appearance', description: 'Light, dark or system' }, { path: 'privacy', name: 'Data and privacy', description: 'Download your training data' }, { path: 'account', name: 'Account', description: 'Email, password and sign out' }]
-export function ProfileHome() { return <div className="profile-screen"><h1>Profile</h1><nav className="profile-links" aria-label="Profile settings">{sections.map(section => <Link className="settings-card" key={section.path} to={`/profile/${section.path}`}><strong>{section.name}</strong><span>{section.description}</span></Link>)}</nav></div> }
+export function ProfileHome() { return <div className="profile-screen"><h1>Profile</h1><nav className="profile-links" aria-label="Profile settings">{sections.map(section => <Link className="settings-card" key={section.path} to={`/profile/${section.path}`}><strong>{section.name}</strong><span>{section.description}</span></Link>)}<Link className="settings-card" to="/profile/about"><strong>About ARC FIT</strong><span>App version and update status</span></Link></nav></div> }
 function Screen({ title, children }: { title: string; children: ReactNode }) { return <div className="profile-screen"><Link to="/profile">‹ Profile</Link><h1>{title}</h1>{children}</div> }
 function message(error: unknown) { return error instanceof Error ? error.message : 'Unable to complete this action. Please retry.' }
 

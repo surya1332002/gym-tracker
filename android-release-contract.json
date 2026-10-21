@@ -1,0 +1,25 @@
+{
+  "contractId": "arc-fit-storage-1",
+  "applicationId": "com.arcfit.app",
+  "nativeVersion": "1.0.0",
+  "nativeVersionCode": 1,
+  "otaChannel": "development",
+  "expectedBaselineHash": "73f1caa28fb986cd03b4413e2910fff8ff68224e42b870cc84fcdc58ee65b676",
+  "publicKeySha256": null,
+  "baselineFiles": [
+    "capacitor.config.ts",
+    "src/data/vault.ts",
+    "src/data/workoutStore.ts",
+    "src/data/startCache.ts",
+    "src/data/workoutSync.ts",
+    "src/features/workout/sessions.ts",
+    "src/features/workout/programmes.ts",
+    "src/features/workout/WorkoutDraft.tsx",
+    "src/auth/deviceAccess.ts"
+  ],
+  "baselineTrees": [
+    "android",
+    "docs/migrations"
+  ],
+  "notes": "Record a new baseline only for a reviewed new native APK. OTA requires an independently supplied hash from the distributed APK build. No provider credentials or signing private keys belong here."
+}

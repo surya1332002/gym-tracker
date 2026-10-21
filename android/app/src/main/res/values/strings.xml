@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">ARC FIT</string>
+    <string name="title_activity_main">ARC FIT</string>
+    <string name="package_name">com.arcfit.app</string>
+    <string name="custom_url_scheme">com.arcfit.app</string>
+</resources>

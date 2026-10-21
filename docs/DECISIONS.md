@@ -192,3 +192,8 @@ The 30-day workout-trash window and 30-day account-recovery window do not establ
 ## Integrated milestone decisions ? 2026-10-16
 
 Retain red/black ARC FIT navigation and the approved compact tile/day flows. Optional targets remain NULL; recorded canonical loads retain precision. Exercise identity and original snapshots survive replacement/editing. Encrypt account-scoped device workout/draft/outbox/conflict payloads with independent record authentication; fail closed when trusted keys cannot be recovered. Internal replay receipts/device keys are excluded from exports. Preserve pinned public dataset bytes across Windows checkout. Do not enable deletion or AI UI actions before their backend capabilities are configured and verified. No production deployment authorized.
+
+
+## 2026-10-20 - Native Android and guarded development updates
+
+Approved Android as primary using one React/Vite codebase with Capacitor, com.arcfit.app and native supported edge-to-edge. Capgo manual download mode stages verified encrypted bundles; only a prior-launch bundle can activate before any editing screen mounts, with bounded read-only workout/outbox/draft safety checks. No next/background/resume activation is used. Retain previous successful and built-in bundles. Native/data/dependency baseline changes require a same-key APK upgrade; backend compatibility must remain backward compatible absent a separately approved server-enforced version contract. Provider accounts, paid plans and private signing material are not fabricated or enabled. Development publication is isolated from main/production and automatic push publication stays opt-in until an installed native baseline is verified.

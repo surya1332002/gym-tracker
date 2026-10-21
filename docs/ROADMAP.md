@@ -75,3 +75,8 @@ Allowed status values: Not Started, In Progress, Blocked, Completed.
 ## Integrated milestone ? 2026-10-16
 
 Workout engine, exercise management, strength/history/calendar, body/cardio/photos, Home/Profile and encrypted offline/retry workflows are implemented and regression-tested. Final 212 public clean-snapshot tests, TypeScript and production build passed. Production deployment remains unauthorized. Remaining blocked activation: trusted HTTPS for phone cold-start offline/PWA; approved purge-function deployment/secrets/schedule; optional AI provider credentials/protected deployment; individual-session inventory/revocation requires an additional scoped backend capability. See APPLICATION_IMPLEMENTATION.md.
+
+
+## Native Android milestone - 2026-10-20
+
+Platform integration, signed OTA preparation, About/status and repeatable development release tooling implemented. Web/unit/type/native-asset checks pass. APK compilation/device verification pending Android SDK licence/setup; hosted OTA pending owner Capgo account/token and signing setup. See docs/ANDROID_RELEASES.md. This is not a completed native release or production deployment.

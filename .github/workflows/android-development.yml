@@ -1,0 +1,108 @@
+name: Android development release
+
+on:
+  push:
+    branches: [develop]
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: Build signed APK or explicitly publish development OTA
+        type: choice
+        options: [apk, ota]
+        default: apk
+        required: true
+      distributed_native_baseline:
+        description: OTA only - exact SHA-256 from the signed APK already distributed to testers
+        type: string
+        required: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-development-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: github.ref == 'refs/heads/develop' && (github.event_name == 'workflow_dispatch' || vars.ARC_ENABLE_DEVELOPMENT_OTA == 'true')
+    runs-on: ubuntu-latest
+    environment: android-development
+    timeout-minutes: 35
+    env:
+      ARC_NATIVE_BUILD: '1'
+      ARC_OTA_CHANNEL: development
+      ARC_RELEASE_OPERATION: ${{ github.event_name == 'push' && 'ota' || inputs.operation }}
+      ARC_DISTRIBUTED_NATIVE_BASELINE: ${{ github.event_name == 'push' && vars.ARC_DISTRIBUTED_NATIVE_BASELINE || inputs.distributed_native_baseline }}
+      ARC_ANDROID_APP_ID: ${{ vars.ARC_ANDROID_APP_ID }}
+      ARC_OTA_PUBLIC_KEY: ${{ vars.ARC_OTA_PUBLIC_KEY }}
+      VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+      VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: android-actions/setup-android@v3
+      - name: Install pinned Android build prerequisites
+        run: sdkmanager 'platforms;android-36' 'build-tools;35.0.0'
+      - run: npm ci
+      - run: npm test
+      - run: npm run typecheck
+      - name: Verify native source baseline and select bundle version
+        run: |
+          BASELINE=$(node scripts/android-release.mjs verify)
+          echo "ARC_WEB_BUNDLE_VERSION=1.0.${GITHUB_RUN_NUMBER}+${BASELINE}" >> "$GITHUB_ENV"
+          printf '%s\n' "$BASELINE" > native-baseline.sha256
+      - name: Require OTA credentials and distributed native baseline before provider access
+        if: env.ARC_RELEASE_OPERATION == 'ota'
+        env:
+          CAPGO_TOKEN: ${{ secrets.CAPGO_TOKEN }}
+          CAPGO_PRIVATE_KEY: ${{ secrets.CAPGO_PRIVATE_KEY }}
+          DISTRIBUTED_BASELINE: ${{ env.ARC_DISTRIBUTED_NATIVE_BASELINE }}
+        run: |
+          test -n "$CAPGO_TOKEN" && test -n "$CAPGO_PRIVATE_KEY" && test -n "$ARC_OTA_PUBLIC_KEY"
+          test "$DISTRIBUTED_BASELINE" = "$(cat native-baseline.sha256)"
+      - name: Build web assets and sync Android
+        if: env.ARC_RELEASE_OPERATION == 'ota'
+        run: node scripts/android-release.mjs build
+      - name: Build signed development APK
+        if: env.ARC_RELEASE_OPERATION == 'apk'
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ARC_ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ARC_ANDROID_KEYSTORE_PASSWORD }}
+          ARC_ANDROID_KEY_ALIAS: ${{ secrets.ARC_ANDROID_KEY_ALIAS }}
+          ARC_ANDROID_KEY_PASSWORD: ${{ secrets.ARC_ANDROID_KEY_PASSWORD }}
+        run: |
+          test -n "$ANDROID_KEYSTORE_BASE64"
+          export ARC_ANDROID_KEYSTORE_PATH="$RUNNER_TEMP/arc-fit-release.jks"
+          umask 077
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$ARC_ANDROID_KEYSTORE_PATH"
+          trap 'rm -f "$ARC_ANDROID_KEYSTORE_PATH"' EXIT
+          node scripts/android-release.mjs apk
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose android/app/build/outputs/apk/release/app-release.apk
+      - name: Publish signed development OTA (explicit opt-in only)
+        if: env.ARC_RELEASE_OPERATION == 'ota'
+        env:
+          CAPGO_TOKEN: ${{ secrets.CAPGO_TOKEN }}
+          CAPGO_PRIVATE_KEY: ${{ secrets.CAPGO_PRIVATE_KEY }}
+          ARC_NATIVE_BASELINE_SHA256: ${{ env.ARC_DISTRIBUTED_NATIVE_BASELINE }}
+        run: node scripts/publish-android-ota.mjs
+      - name: Upload signed APK and release evidence
+        if: env.ARC_RELEASE_OPERATION == 'apk'
+        uses: actions/upload-artifact@v4
+        with:
+          name: arc-fit-development-${{ github.run_number }}
+          if-no-files-found: error
+          retention-days: 14
+          path: |
+            android/app/build/outputs/apk/release/app-release.apk
+            dist/native-release.json
+            native-baseline.sha256

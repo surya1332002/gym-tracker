@@ -28,3 +28,16 @@ dist-ssr
 # Original personal workout files are local account data.
 data/my-workout/
 data/**/my-workout/
+
+# Local Android toolchains, signing material and private OTA keys.
+.android-local/
+*.keystore
+*.jks
+*.p12
+*.apk
+*.aab
+.capgo_key*
+!*.pub
+android/local.properties
+android/.gradle/
+android/**/build/

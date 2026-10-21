@@ -1,0 +1,90 @@
+apply plugin: 'com.android.application'
+
+def releaseSigningValues = [
+    storePath: System.getenv('ARC_ANDROID_KEYSTORE_PATH'),
+    storePassword: System.getenv('ARC_ANDROID_KEYSTORE_PASSWORD'),
+    keyAlias: System.getenv('ARC_ANDROID_KEY_ALIAS'),
+    keyPassword: System.getenv('ARC_ANDROID_KEY_PASSWORD')
+]
+def hasReleaseSigning = releaseSigningValues.values().every { it != null && !it.trim().isEmpty() }
+
+android {
+    namespace = "com.arcfit.app"
+    compileSdk = rootProject.ext.compileSdkVersion
+    defaultConfig {
+        applicationId "com.arcfit.app"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode 1
+        versionName "1.0.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        aaptOptions {
+             // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
+             // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
+            ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
+        }
+    }
+    signingConfigs {
+        release {
+            if (hasReleaseSigning) {
+                storeFile file(releaseSigningValues.storePath)
+                storePassword releaseSigningValues.storePassword
+                keyAlias releaseSigningValues.keyAlias
+                keyPassword releaseSigningValues.keyPassword
+            }
+        }
+    }
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+// Debug configuration never needs release secrets. Release packaging must never
+// silently emit an unsigned artifact or use Android's development signing key.
+gradle.taskGraph.whenReady { graph ->
+    def packagesRelease = graph.allTasks.any {
+        it.project == project && it.name ==~ /(?i)(assemble|bundle|package|validateSigning).*Release.*/
+    }
+    if (packagesRelease) {
+        if (!hasReleaseSigning) {
+            throw new GradleException('Release signing requires all four ARC_ANDROID_KEYSTORE_PATH, ARC_ANDROID_KEYSTORE_PASSWORD, ARC_ANDROID_KEY_ALIAS and ARC_ANDROID_KEY_PASSWORD environment variables.')
+        }
+        if (!file(releaseSigningValues.storePath).isFile()) {
+            throw new GradleException('Release signing keystore file is unavailable. Supply an existing private keystore through the configured environment.')
+        }
+    }
+}
+
+repositories {
+    flatDir{
+        dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
+    implementation "androidx.activity:activity:$androidxActivityVersion"
+    implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
+    implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
+    implementation project(':capacitor-android')
+    testImplementation "junit:junit:$junitVersion"
+    androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
+    implementation project(':capacitor-cordova-android-plugins')
+}
+
+apply from: 'capacitor.build.gradle'
+
+try {
+    def servicesJSON = file('google-services.json')
+    if (servicesJSON.text) {
+        apply plugin: 'com.google.gms.google-services'
+    }
+} catch(Exception e) {
+    logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
+}

@@ -188,3 +188,16 @@ The approved integrated features and additive migrations are implemented on deve
 ## HTTPS develop preview setup - 2026-10-20
 
 Prepared a develop-only Netlify build context and guarded public-configuration build script, retaining the default/main Vite build, SPA fallback and service-worker cache policy. See docs/NETLIFY_DEVELOP_PREVIEW.md for exact separate-project and public-variable setup. Local 19 relevant tests, TypeScript and guarded production build passed. Netlify is signed out and local Netlify credentials/project link are absent; no preview URL exists, so hosted authentication/session/workout/PWA/offline checks remain unverified. No production deployment, main merge, Git push, Supabase settings change or real workout write occurred. Next action: user signs into Netlify; create a separate develop project and configure only the two public Supabase variables.
+
+
+## Native Android integration handoff - 2026-10-20
+
+Android is the approved primary platform. Capacitor 8.5.3 packages the existing React/Vite codebase as com.arcfit.app, native version 1.0.0/code 1. Native AndroidX edge-to-edge/SystemBars, original branding, stable localhost storage origin, manual signed Capgo staging, protected startup activation and Profile About are implemented. Service workers remain enabled for web/PWA and are not registered in native. No backend/schema/policy or real workout data changes occurred.
+
+Release tooling includes native/storage/dependency fingerprint checks, public configuration/output validation, retained Android signing settings and an opt-in development-only GitHub OTA workflow. No signing keys or Capgo account are configured; no OTA or APK has been distributed. Out-of-band incompatible backend changes require a future server-enforced version contract; this milestone does not add one.
+
+Files: android/, capacitor.config.ts, android-release-contract.json, src/native/, src/features/profile/About.tsx, platform entry/auth/About wiring, Vite metadata, package/lock, release scripts, workflow and docs/ANDROID_RELEASES.md. Existing private import routes/files and unrelated documentation edits remain local and preserved.
+
+Executed: 256 Node tests passed; subsequent targeted native/release 21 tests passed; TypeScript passed; production web build passed; guarded native asset build and Capacitor sync passed. Portable JDK 21 checksum/version and Gradle 8.14.3 --version passed. Debug build preflight rejects absent SDK; publisher rejects missing CAPGO_TOKEN before provider access. Android compilation/lint/device login, offline persistence and hosted OTA/rollback remain unverified.
+
+Next action: owner accepts Google's SDK terms and configures the SDK, stable signing and Capgo credentials as documented in docs/ANDROID_RELEASES.md. Configure OTA public verification material before the first distributed APK, record its native baseline, build/sign/install, then perform on-device checks. Do not uninstall the PWA or clear storage; sync pending browser workouts before moving to the separate native device vault. Main/production are unchanged.

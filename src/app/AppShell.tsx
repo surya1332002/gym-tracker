@@ -1,4 +1,5 @@
 import WorkoutCalendar from '../features/workout/WorkoutCalendar'
+import About from '../features/profile/About'
 import { useEffect, useRef } from 'react'
 import { Link, NavLink, Route, Routes, useLocation } from 'react-router-dom'
 import HomeDashboard from '../features/home/HomeDashboard'
@@ -78,6 +79,7 @@ export default function AppShell({ userId, email, logout, signingOut, sessionErr
           <Route path="/progress/body/*" element={<BodyProgress userId={userId}/>}/>
           <Route path="/progress/photos" element={<ProgressPhotos userId={userId}/>}/>
           <Route path="/profile" element={<ProfileHome/>}/>
+          <Route path="/profile/about" element={<About/>}/>
           <Route path="/profile/personal" element={<PersonalInformation userId={userId}/>}/>
           <Route path="/profile/training" element={<TrainingPreferences userId={userId}/>}/>
           <Route path="/profile/appearance" element={<AppearanceSettings userId={userId}/>}/>

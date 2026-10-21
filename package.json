@@ -9,9 +9,19 @@
     "build:develop-preview": "node scripts/build-develop-preview.mjs",
     "preview": "vite preview",
     "typecheck": "tsc -b",
-    "test": "node --test tests/*.test.mjs"
+    "test": "node --test tests/*.test.mjs",
+    "android:baseline": "node scripts/android-release.mjs baseline",
+    "android:verify": "node scripts/android-release.mjs verify",
+    "android:build": "node scripts/android-release.mjs build",
+    "android:apk": "node scripts/android-release.mjs apk",
+    "android:ota": "node scripts/publish-android-ota.mjs"
   },
   "dependencies": {
+    "@capacitor/android": "8.5.3",
+    "@capacitor/app": "8.1.2",
+    "@capacitor/core": "8.5.3",
+    "@capacitor/splash-screen": "8.0.2",
+    "@capgo/capacitor-updater": "8.53.1",
     "@noble/ciphers": "^2.4.0",
     "@noble/hashes": "^2.4.0",
     "@supabase/supabase-js": "2.117.3",
@@ -21,6 +31,7 @@
     "react-router-dom": "7.18.4"
   },
   "devDependencies": {
+    "@capacitor/cli": "8.5.3",
     "@eslint/js": "^9.36.0",
     "@types/node": "^22.20.5",
     "@types/react": "^19.1.13",

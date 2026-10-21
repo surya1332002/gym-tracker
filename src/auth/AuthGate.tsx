@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import AppShell from '../app/AppShell'
+import NativeLaunchGate, { NativeReady } from '../native/NativeLaunchGate'
 import { supabase } from '../lib/supabase'
 import './auth.css'
 import OfflineAccess from './OfflineAccess'
@@ -95,16 +96,16 @@ export default function AuthGate() {
     } finally { setSigningOut(false) }
   }
 
-  if (initializing) return <main className="gym-auth-screen"><div className="gym-auth-card" role="status">Restoring your session…</div></main>
+  if (initializing) return <NativeReady><main className="gym-auth-screen"><div className="gym-auth-card" role="status">Restoring your session…</div></main></NativeReady>
 
   const trusted = (() => { try { return trustedAccounts() } catch { return [] } })()
-  if (offlineUser && isUnlocked(offlineUser.userId)) return <><button className="offline-login-button" onClick={requestLogin}>Sign in to sync</button><AppShell key={offlineUser.userId} userId={offlineUser.userId} email={offlineUser.email} logout={() => void logout()} signingOut={signingOut} sessionError={sessionError || 'Trusted offline access. Sign in again before syncing cloud data.'} /></>
+  if (offlineUser && isUnlocked(offlineUser.userId)) return <NativeLaunchGate userId={offlineUser.userId}><button className="offline-login-button" onClick={requestLogin}>Sign in to sync</button><AppShell key={offlineUser.userId} userId={offlineUser.userId} email={offlineUser.email} logout={() => void logout()} signingOut={signingOut} sessionError={sessionError || 'Trusted offline access. Sign in again before syncing cloud data.'} /></NativeLaunchGate>
   if (forceLogin || (!session && !offlinePrompt && (navigator.onLine || !trusted.length))) return <><AuthForm initialError={sessionError} />{trusted.length > 0 && <button className="offline-login-button" onClick={() => { setForceLogin(false); setOfflinePrompt(true) }}>Use trusted offline access</button>}</>
   if (!session || vaultReady !== session.user.id || !isUnlocked(session.user.id)) {
-    if (session && navigator.onLine && !vaultError && !offlinePrompt) return <main className="gym-auth-screen"><section className="gym-auth-card" role="status">Verifying private device access?</section></main>
-    return <OfflineAccess expectedUserId={session?.user.id} error={vaultError} onUnlock={account => { setOfflineUser(account); setForceLogin(false) }} onRetry={() => { setOfflinePrompt(false); setRetryVault(value => value + 1) }} onLogin={requestLogin} />
+    if (session && navigator.onLine && !vaultError && !offlinePrompt) return <NativeReady><main className="gym-auth-screen"><section className="gym-auth-card" role="status">Verifying private device access?</section></main></NativeReady>
+    return <NativeReady><OfflineAccess expectedUserId={session?.user.id} error={vaultError} onUnlock={account => { setOfflineUser(account); setForceLogin(false) }} onRetry={() => { setOfflinePrompt(false); setRetryVault(value => value + 1) }} onLogin={requestLogin} /></NativeReady>
   }
-  return <AppShell key={session.user.id} userId={session.user.id} email={session.user.email} logout={() => void logout()} signingOut={signingOut} sessionError={sessionError} />
+  return <NativeLaunchGate userId={session.user.id}><AppShell key={session.user.id} userId={session.user.id} email={session.user.email} logout={() => void logout()} signingOut={signingOut} sessionError={sessionError} /></NativeLaunchGate>
 }
 
 function AuthForm({ initialError }: { initialError: string }) {
@@ -165,7 +166,7 @@ function AuthForm({ initialError }: { initialError: string }) {
     finally { setBusy(false) }
   }
 
-  return <main className="gym-auth-screen">
+  return <NativeReady><main className="gym-auth-screen">
     <section className="gym-auth-card" aria-labelledby="gym-auth-title">
       <div className="gym-auth-brand"><img src="/icons/arc-fit.svg" width="40" height="40" alt="" /> ARC FIT</div>
       <h1 id="gym-auth-title">{mode === 'login' ? 'Welcome back' : 'Start your next chapter'}</h1>
@@ -188,5 +189,5 @@ function AuthForm({ initialError }: { initialError: string }) {
       {needsConfirmation && <button className="gym-auth-resend" type="button" disabled={busy || !email.trim()} onClick={() => void resend()}>Resend confirmation email</button>}
       <p className="gym-auth-footnote">Your private training space. Build, log and review your workouts.</p>
     </section>
-  </main>
+  </main></NativeReady>
 }
